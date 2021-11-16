@@ -36,8 +36,16 @@ var _SOLIDITY_TYPE_MAXIMA;
 })(exports.Rounding || (exports.Rounding = {}));
 
 console.log(process.env.REACT_APP_NODE_ENV);
-var FACTORY_ADDRESS = process.env.REACT_APP_NODE_ENV === 'production' ? '0x27aD238316128DC85b23b0EC1eb3f7153afd6860' : '0x037768f79c2985079c0B29C0b39F5bf1D598Db83';
-var INIT_CODE_HASH = process.env.REACT_APP_NODE_ENV === 'production' ? '0xfe604490e88884eee0a2ef7362417e3771d067dc74cd2e605d0b3e1e90f300cb' : '0x3a37cf8ecde8166faa9daa2f4a070be1e622988f207a874db2907fd5220573f1';
+var FACTORY_ADDRESSES = {
+  '56': '0x27aD238316128DC85b23b0EC1eb3f7153afd6860',
+  '97': '0x037768f79c2985079c0B29C0b39F5bf1D598Db83'
+};
+var FACTORY_ADDRESS = FACTORY_ADDRESSES[process.env.REACT_APP_CHAIN_ID];
+var INIT_CODE_HASHES = {
+  '56': '0xfe604490e88884eee0a2ef7362417e3771d067dc74cd2e605d0b3e1e90f300cb',
+  '97': '0x3a37cf8ecde8166faa9daa2f4a070be1e622988f207a874db2907fd5220573f1'
+};
+var INIT_CODE_HASH = INIT_CODE_HASHES[process.env.REACT_APP_CHAIN_ID];
 var MINIMUM_LIQUIDITY = /*#__PURE__*/JSBI.BigInt(1000); // exports for internal consumption
 
 var ZERO = /*#__PURE__*/JSBI.BigInt(0);
@@ -378,11 +386,16 @@ var _WETH;
 var Token = /*#__PURE__*/function (_Currency) {
   _inheritsLoose(Token, _Currency);
 
-  function Token(chainId, address, decimals, symbol, name) {
+  function Token(chainId, address, decimals, symbol, name, priority) {
     var _this;
+
+    if (priority === void 0) {
+      priority = 0;
+    }
 
     _this = _Currency.call(this, decimals, symbol, name) || this;
     _this.chainId = chainId;
+    _this.priority = priority;
     _this.address = validateAndParseAddress(address);
     return _this;
   }

@@ -13,7 +13,13 @@ export declare enum Rounding {
     ROUND_HALF_UP = 1,
     ROUND_UP = 2
 }
+export declare const FACTORY_ADDRESSES: {
+    [key: string]: string;
+};
 export declare const FACTORY_ADDRESS: string;
+export declare const INIT_CODE_HASHES: {
+    [key: string]: string;
+};
 export declare const INIT_CODE_HASH: string;
 export declare const MINIMUM_LIQUIDITY: JSBI;
 export declare const ZERO: JSBI;
