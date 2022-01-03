@@ -28,7 +28,9 @@ export const FACTORY_ADDRESSES = {
   [key: string]: string
 }
 
-export const FACTORY_ADDRESS = FACTORY_ADDRESSES[process.env.REACT_APP_CHAIN_ID as string]
+// Use value from environment variable if defined
+export const FACTORY_ADDRESS: string =
+  process.env.REACT_APP_FACTORY_ADDRESS || FACTORY_ADDRESSES[process.env.REACT_APP_CHAIN_ID as string]
 
 export const INIT_CODE_HASHES = {
   '56': '0xfe604490e88884eee0a2ef7362417e3771d067dc74cd2e605d0b3e1e90f300cb',
@@ -37,7 +39,9 @@ export const INIT_CODE_HASHES = {
   [key: string]: string
 }
 
-export const INIT_CODE_HASH = INIT_CODE_HASHES[process.env.REACT_APP_CHAIN_ID as string]
+// Use value from environment variable if defined
+export const INIT_CODE_HASH: string =
+  process.env.REACT_INIT_CODE_HASH || INIT_CODE_HASHES[process.env.REACT_APP_CHAIN_ID as string]
 
 export const MINIMUM_LIQUIDITY = JSBI.BigInt(1000)
 
