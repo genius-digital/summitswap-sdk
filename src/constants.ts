@@ -23,7 +23,7 @@ console.log(process.env.REACT_APP_NODE_ENV)
 
 export const FACTORY_ADDRESSES = {
   '56': '0x27aD238316128DC85b23b0EC1eb3f7153afd6860',
-  '97': '0x037768f79c2985079c0B29C0b39F5bf1D598Db83'
+  '97': '0x765317D857df6BceA1B3489b8B66422B9967eF8B'
 } as {
   [key: string]: string
 }
@@ -32,7 +32,7 @@ export const FACTORY_ADDRESS = FACTORY_ADDRESSES[process.env.REACT_APP_CHAIN_ID 
 
 export const INIT_CODE_HASHES = {
   '56': '0xfe604490e88884eee0a2ef7362417e3771d067dc74cd2e605d0b3e1e90f300cb',
-  '97': '0x3a37cf8ecde8166faa9daa2f4a070be1e622988f207a874db2907fd5220573f1'
+  '97': '0xfe604490e88884eee0a2ef7362417e3771d067dc74cd2e605d0b3e1e90f300cb'
 } as {
   [key: string]: string
 }
