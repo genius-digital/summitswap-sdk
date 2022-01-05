@@ -38,14 +38,16 @@ var _SOLIDITY_TYPE_MAXIMA;
 console.log(process.env.REACT_APP_NODE_ENV);
 var FACTORY_ADDRESSES = {
   '56': '0x27aD238316128DC85b23b0EC1eb3f7153afd6860',
-  '97': '0x037768f79c2985079c0B29C0b39F5bf1D598Db83'
-};
-var FACTORY_ADDRESS = FACTORY_ADDRESSES[process.env.REACT_APP_CHAIN_ID];
+  '97': '0x765317D857df6BceA1B3489b8B66422B9967eF8B'
+}; // Use value from environment variable if defined
+
+var FACTORY_ADDRESS = process.env.REACT_APP_FACTORY_ADDRESS || FACTORY_ADDRESSES[process.env.REACT_APP_CHAIN_ID];
 var INIT_CODE_HASHES = {
   '56': '0xfe604490e88884eee0a2ef7362417e3771d067dc74cd2e605d0b3e1e90f300cb',
-  '97': '0x3a37cf8ecde8166faa9daa2f4a070be1e622988f207a874db2907fd5220573f1'
-};
-var INIT_CODE_HASH = INIT_CODE_HASHES[process.env.REACT_APP_CHAIN_ID];
+  '97': '0xfe604490e88884eee0a2ef7362417e3771d067dc74cd2e605d0b3e1e90f300cb'
+}; // Use value from environment variable if defined
+
+var INIT_CODE_HASH = process.env.REACT_INIT_CODE_HASH || INIT_CODE_HASHES[process.env.REACT_APP_CHAIN_ID];
 var MINIMUM_LIQUIDITY = /*#__PURE__*/JSBI.BigInt(1000); // exports for internal consumption
 
 var ZERO = /*#__PURE__*/JSBI.BigInt(0);
