@@ -388,16 +388,21 @@ var _WETH;
 var Token = /*#__PURE__*/function (_Currency) {
   _inheritsLoose(Token, _Currency);
 
-  function Token(chainId, address, decimals, symbol, name, priority) {
+  function Token(chainId, address, decimals, symbol, name, priority, referralEnabled) {
     var _this;
 
     if (priority === void 0) {
       priority = 0;
     }
 
+    if (referralEnabled === void 0) {
+      referralEnabled = false;
+    }
+
     _this = _Currency.call(this, decimals, symbol, name) || this;
     _this.chainId = chainId;
     _this.priority = priority;
+    _this.referralEnabled = referralEnabled;
     _this.address = validateAndParseAddress(address);
     return _this;
   }
