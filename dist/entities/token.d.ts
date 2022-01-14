@@ -7,7 +7,8 @@ export declare class Token extends Currency {
     readonly chainId: ChainId;
     readonly address: string;
     readonly priority: number;
-    constructor(chainId: ChainId, address: string, decimals: number, symbol?: string, name?: string, priority?: number);
+    readonly referralEnabled: boolean;
+    constructor(chainId: ChainId, address: string, decimals: number, symbol?: string, name?: string, priority?: number, referralEnabled?: boolean);
     /**
      * Returns true if the two tokens are equivalent, i.e. have the same chainId and address.
      * @param other other token to compare
