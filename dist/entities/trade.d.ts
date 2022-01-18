@@ -48,6 +48,7 @@ export declare class Trade {
      * The percent difference between the mid price before the trade and the trade execution price.
      */
     readonly priceImpact: Percent;
+    readonly isPancakeSwap: boolean;
     /**
      * Constructs an exact in trade with the given amount in and route
      * @param route route of the exact in trade
@@ -60,7 +61,7 @@ export declare class Trade {
      * @param amountOut the amount returned by the trade
      */
     static exactOut(route: Route, amountOut: CurrencyAmount): Trade;
-    constructor(route: Route, amount: CurrencyAmount, tradeType: TradeType);
+    constructor(route: Route, amount: CurrencyAmount, tradeType: TradeType, isPancakeSwap?: boolean);
     /**
      * Get the minimum amount that must be received from this trade for the given slippage tolerance
      * @param slippageTolerance tolerance of unfavorable slippage from the execution price of this trade
@@ -85,7 +86,7 @@ export declare class Trade {
      * @param originalAmountIn used in recursion; the original value of the currencyAmountIn parameter
      * @param bestTrades used in recursion; the current list of best trades
      */
-    static bestTradeExactIn(pairs: Pair[], currencyAmountIn: CurrencyAmount, currencyOut: Currency, { maxNumResults, maxHops }?: BestTradeOptions, currentPairs?: Pair[], originalAmountIn?: CurrencyAmount, bestTrades?: Trade[]): Trade[];
+    static bestTradeExactIn(pairs: Pair[], currencyAmountIn: CurrencyAmount, currencyOut: Currency, { maxNumResults, maxHops }?: BestTradeOptions, currentPairs?: Pair[], originalAmountIn?: CurrencyAmount, bestTrades?: Trade[], pancakeFactoryAddress?: string, pancakeInitCodeHash?: string): Trade[];
     /**
      * similar to the above method but instead targets a fixed output amount
      * given a list of pairs, and a fixed amount out, returns the top `maxNumResults` trades that go from an input token
@@ -101,6 +102,6 @@ export declare class Trade {
      * @param originalAmountOut used in recursion; the original value of the currencyAmountOut parameter
      * @param bestTrades used in recursion; the current list of best trades
      */
-    static bestTradeExactOut(pairs: Pair[], currencyIn: Currency, currencyAmountOut: CurrencyAmount, { maxNumResults, maxHops }?: BestTradeOptions, currentPairs?: Pair[], originalAmountOut?: CurrencyAmount, bestTrades?: Trade[]): Trade[];
+    static bestTradeExactOut(pairs: Pair[], currencyIn: Currency, currencyAmountOut: CurrencyAmount, { maxNumResults, maxHops }?: BestTradeOptions, currentPairs?: Pair[], originalAmountOut?: CurrencyAmount, bestTrades?: Trade[], pancakeFactoryAddress?: string, pancakeInitCodeHash?: string): Trade[];
 }
 export {};

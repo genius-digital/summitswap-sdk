@@ -30,3 +30,7 @@ export declare const WETH: {
     56: Token;
     97: Token;
 };
+export declare const pancakeSwapWETH: {
+    56: Token;
+    97: Token;
+};

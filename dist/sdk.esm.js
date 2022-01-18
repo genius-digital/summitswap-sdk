@@ -380,7 +380,7 @@ function Currency(decimals, symbol, name) {
 Currency.ETHER = /*#__PURE__*/new Currency(18, 'BNB', 'Binance');
 var ETHER = Currency.ETHER;
 
-var _WETH;
+var _WETH, _pancakeSwapWETH;
 /**
  * Represents an ERC20 token with a unique address and some metadata.
  */
@@ -454,6 +454,7 @@ function currencyEquals(currencyA, currencyB) {
   }
 }
 var WETH = (_WETH = {}, _WETH[ChainId.MAINNET] = /*#__PURE__*/new Token(ChainId.MAINNET, '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c', 18, 'WBNB', 'Wrapped BNB'), _WETH[ChainId.BSCTESTNET] = /*#__PURE__*/new Token(ChainId.BSCTESTNET, '0xae13d989dac2f0debff460ac112a837c89baa7cd', 18, 'WBNB', 'Wrapped BNB'), _WETH);
+var pancakeSwapWETH = (_pancakeSwapWETH = {}, _pancakeSwapWETH[ChainId.MAINNET] = /*#__PURE__*/new Token(ChainId.MAINNET, '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c', 18, 'WBNB', 'Wrapped BNB'), _pancakeSwapWETH[ChainId.BSCTESTNET] = /*#__PURE__*/new Token(ChainId.BSCTESTNET, '0xae13d989dac2f0debff460ac112a837c89baa7cd', 18, 'WBNB', 'Wrapped BNB'), _pancakeSwapWETH);
 
 var _toSignificantRoundin, _toFixedRounding;
 var Decimal = /*#__PURE__*/toFormat(_Decimal);
@@ -1100,15 +1101,35 @@ function tradeComparator(a, b) {
  * the input currency amount.
  */
 
-function wrappedAmount(currencyAmount, chainId) {
+function wrappedAmount(currencyAmount, chainId, isPancakeSwap) {
+  if (isPancakeSwap === void 0) {
+    isPancakeSwap = false;
+  }
+
   if (currencyAmount instanceof TokenAmount) return currencyAmount;
-  if (currencyAmount.currency === ETHER) return new TokenAmount(WETH[chainId], currencyAmount.raw);
+
+  if (currencyAmount.currency === ETHER) {
+    var _WETH = !isPancakeSwap ? WETH[chainId] : pancakeSwapWETH[chainId];
+
+    return new TokenAmount(_WETH, currencyAmount.raw);
+  }
+
    process.env.NODE_ENV !== "production" ? invariant(false, 'CURRENCY') : invariant(false) ;
 }
 
-function wrappedCurrency(currency, chainId) {
+function wrappedCurrency(currency, chainId, isPancakeSwap) {
+  if (isPancakeSwap === void 0) {
+    isPancakeSwap = false;
+  }
+
   if (currency instanceof Token) return currency;
-  if (currency === ETHER) return WETH[chainId];
+
+  if (currency === ETHER) {
+    var _WETH = !isPancakeSwap ? WETH[chainId] : pancakeSwapWETH[chainId];
+
+    return _WETH;
+  }
+
    process.env.NODE_ENV !== "production" ? invariant(false, 'CURRENCY') : invariant(false) ;
 }
 /**
@@ -1118,13 +1139,17 @@ function wrappedCurrency(currency, chainId) {
 
 
 var Trade = /*#__PURE__*/function () {
-  function Trade(route, amount, tradeType) {
+  function Trade(route, amount, tradeType, isPancakeSwap) {
+    if (isPancakeSwap === void 0) {
+      isPancakeSwap = false;
+    }
+
     var amounts = new Array(route.path.length);
     var nextPairs = new Array(route.pairs.length);
 
     if (tradeType === TradeType.EXACT_INPUT) {
       !currencyEquals(amount.currency, route.input) ? process.env.NODE_ENV !== "production" ? invariant(false, 'INPUT') : invariant(false) : void 0;
-      amounts[0] = wrappedAmount(amount, route.chainId);
+      amounts[0] = wrappedAmount(amount, route.chainId, isPancakeSwap);
 
       for (var i = 0; i < route.path.length - 1; i++) {
         var pair = route.pairs[i];
@@ -1138,7 +1163,7 @@ var Trade = /*#__PURE__*/function () {
       }
     } else {
       !currencyEquals(amount.currency, route.output) ? process.env.NODE_ENV !== "production" ? invariant(false, 'OUTPUT') : invariant(false) : void 0;
-      amounts[amounts.length - 1] = wrappedAmount(amount, route.chainId);
+      amounts[amounts.length - 1] = wrappedAmount(amount, route.chainId, isPancakeSwap);
 
       for (var _i = route.path.length - 1; _i > 0; _i--) {
         var _pair = route.pairs[_i - 1];
@@ -1159,6 +1184,7 @@ var Trade = /*#__PURE__*/function () {
     this.executionPrice = new Price(this.inputAmount.currency, this.outputAmount.currency, this.inputAmount.raw, this.outputAmount.raw);
     this.nextMidPrice = Price.fromRoute(new Route(nextPairs, route.input));
     this.priceImpact = computePriceImpact(route.midPrice, this.inputAmount, this.outputAmount);
+    this.isPancakeSwap = isPancakeSwap;
   }
   /**
    * Constructs an exact in trade with the given amount in and route
@@ -1231,7 +1257,7 @@ var Trade = /*#__PURE__*/function () {
   ;
 
   Trade.bestTradeExactIn = function bestTradeExactIn(pairs, currencyAmountIn, currencyOut, _temp, // used in recursion.
-  currentPairs, originalAmountIn, bestTrades) {
+  currentPairs, originalAmountIn, bestTrades, pancakeFactoryAddress, pancakeInitCodeHash) {
     var _ref = _temp === void 0 ? {} : _temp,
         _ref$maxNumResults = _ref.maxNumResults,
         maxNumResults = _ref$maxNumResults === void 0 ? 3 : _ref$maxNumResults,
@@ -1250,13 +1276,14 @@ var Trade = /*#__PURE__*/function () {
       bestTrades = [];
     }
 
+    var isPancakeSwap = Boolean(pancakeFactoryAddress && pancakeInitCodeHash);
     !(pairs.length > 0) ? process.env.NODE_ENV !== "production" ? invariant(false, 'PAIRS') : invariant(false) : void 0;
     !(maxHops > 0) ? process.env.NODE_ENV !== "production" ? invariant(false, 'MAX_HOPS') : invariant(false) : void 0;
     !(originalAmountIn === currencyAmountIn || currentPairs.length > 0) ? process.env.NODE_ENV !== "production" ? invariant(false, 'INVALID_RECURSION') : invariant(false) : void 0;
     var chainId = currencyAmountIn instanceof TokenAmount ? currencyAmountIn.token.chainId : currencyOut instanceof Token ? currencyOut.chainId : undefined;
     !(chainId !== undefined) ? process.env.NODE_ENV !== "production" ? invariant(false, 'CHAIN_ID') : invariant(false) : void 0;
-    var amountIn = wrappedAmount(currencyAmountIn, chainId);
-    var tokenOut = wrappedCurrency(currencyOut, chainId);
+    var amountIn = wrappedAmount(currencyAmountIn, chainId, isPancakeSwap);
+    var tokenOut = wrappedCurrency(currencyOut, chainId, isPancakeSwap);
 
     for (var i = 0; i < pairs.length; i++) {
       var pair = pairs[i]; // pair irrelevant
@@ -1282,14 +1309,14 @@ var Trade = /*#__PURE__*/function () {
 
 
       if (amountOut.token.equals(tokenOut)) {
-        sortedInsert(bestTrades, new Trade(new Route([].concat(currentPairs, [pair]), originalAmountIn.currency, currencyOut), originalAmountIn, TradeType.EXACT_INPUT), maxNumResults, tradeComparator);
+        sortedInsert(bestTrades, new Trade(new Route([].concat(currentPairs, [pair]), originalAmountIn.currency, currencyOut), originalAmountIn, TradeType.EXACT_INPUT, isPancakeSwap), maxNumResults, tradeComparator);
       } else if (maxHops > 1 && pairs.length > 1) {
         var pairsExcludingThisPair = pairs.slice(0, i).concat(pairs.slice(i + 1, pairs.length)); // otherwise, consider all the other paths that lead from this token as long as we have not exceeded maxHops
 
         Trade.bestTradeExactIn(pairsExcludingThisPair, amountOut, currencyOut, {
           maxNumResults: maxNumResults,
           maxHops: maxHops - 1
-        }, [].concat(currentPairs, [pair]), originalAmountIn, bestTrades);
+        }, [].concat(currentPairs, [pair]), originalAmountIn, bestTrades, pancakeFactoryAddress, pancakeInitCodeHash);
       }
     }
 
@@ -1313,7 +1340,7 @@ var Trade = /*#__PURE__*/function () {
   ;
 
   Trade.bestTradeExactOut = function bestTradeExactOut(pairs, currencyIn, currencyAmountOut, _temp2, // used in recursion.
-  currentPairs, originalAmountOut, bestTrades) {
+  currentPairs, originalAmountOut, bestTrades, pancakeFactoryAddress, pancakeInitCodeHash) {
     var _ref2 = _temp2 === void 0 ? {} : _temp2,
         _ref2$maxNumResults = _ref2.maxNumResults,
         maxNumResults = _ref2$maxNumResults === void 0 ? 3 : _ref2$maxNumResults,
@@ -1332,13 +1359,14 @@ var Trade = /*#__PURE__*/function () {
       bestTrades = [];
     }
 
+    var isPancakeSwap = Boolean(pancakeFactoryAddress && pancakeInitCodeHash);
     !(pairs.length > 0) ? process.env.NODE_ENV !== "production" ? invariant(false, 'PAIRS') : invariant(false) : void 0;
     !(maxHops > 0) ? process.env.NODE_ENV !== "production" ? invariant(false, 'MAX_HOPS') : invariant(false) : void 0;
     !(originalAmountOut === currencyAmountOut || currentPairs.length > 0) ? process.env.NODE_ENV !== "production" ? invariant(false, 'INVALID_RECURSION') : invariant(false) : void 0;
     var chainId = currencyAmountOut instanceof TokenAmount ? currencyAmountOut.token.chainId : currencyIn instanceof Token ? currencyIn.chainId : undefined;
     !(chainId !== undefined) ? process.env.NODE_ENV !== "production" ? invariant(false, 'CHAIN_ID') : invariant(false) : void 0;
-    var amountOut = wrappedAmount(currencyAmountOut, chainId);
-    var tokenIn = wrappedCurrency(currencyIn, chainId);
+    var amountOut = wrappedAmount(currencyAmountOut, chainId, isPancakeSwap);
+    var tokenIn = wrappedCurrency(currencyIn, chainId, isPancakeSwap);
 
     for (var i = 0; i < pairs.length; i++) {
       var pair = pairs[i]; // pair irrelevant
@@ -1364,14 +1392,14 @@ var Trade = /*#__PURE__*/function () {
 
 
       if (amountIn.token.equals(tokenIn)) {
-        sortedInsert(bestTrades, new Trade(new Route([pair].concat(currentPairs), currencyIn, originalAmountOut.currency), originalAmountOut, TradeType.EXACT_OUTPUT), maxNumResults, tradeComparator);
+        sortedInsert(bestTrades, new Trade(new Route([pair].concat(currentPairs), currencyIn, originalAmountOut.currency), originalAmountOut, TradeType.EXACT_OUTPUT, isPancakeSwap), maxNumResults, tradeComparator);
       } else if (maxHops > 1 && pairs.length > 1) {
         var pairsExcludingThisPair = pairs.slice(0, i).concat(pairs.slice(i + 1, pairs.length)); // otherwise, consider all the other paths that arrive at this token as long as we have not exceeded maxHops
 
         Trade.bestTradeExactOut(pairsExcludingThisPair, currencyIn, amountIn, {
           maxNumResults: maxNumResults,
           maxHops: maxHops - 1
-        }, [pair].concat(currentPairs), originalAmountOut, bestTrades);
+        }, [pair].concat(currentPairs), originalAmountOut, bestTrades, pancakeFactoryAddress, pancakeInitCodeHash);
       }
     }
 
@@ -1423,17 +1451,32 @@ var Router = /*#__PURE__*/function () {
     switch (trade.tradeType) {
       case TradeType.EXACT_INPUT:
         if (etherIn) {
-          methodName = useFeeOnTransfer ? 'swapExactETHForTokensSupportingFeeOnTransferTokens' : 'swapExactETHForTokens'; // (uint amountOutMin, address[] calldata path, address to, uint deadline)
+          if (!trade.isPancakeSwap) {
+            methodName = useFeeOnTransfer ? 'swapExactETHForTokensSupportingFeeOnTransferTokens' : 'swapExactETHForTokens';
+          } else {
+            methodName = useFeeOnTransfer ? 'pancakeSwapExactETHForTokensSupportingFeeOnTransferTokens' : 'pancakeSwapExactETHForTokens';
+          } // (uint amountOutMin, address[] calldata path, address to, uint deadline)
+
 
           args = [amountOut, path, to, deadline];
           value = amountIn;
         } else if (etherOut) {
-          methodName = useFeeOnTransfer ? 'swapExactTokensForETHSupportingFeeOnTransferTokens' : 'swapExactTokensForETH'; // (uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
+          if (!trade.isPancakeSwap) {
+            methodName = useFeeOnTransfer ? 'swapExactTokensForETHSupportingFeeOnTransferTokens' : 'swapExactTokensForETH';
+          } else {
+            methodName = useFeeOnTransfer ? 'pancakeSwapExactTokensForETHSupportingFeeOnTransferTokens' : 'pancakeSwapExactTokensForETH';
+          } // (uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
+
 
           args = [amountIn, amountOut, path, to, deadline];
           value = ZERO_HEX;
         } else {
-          methodName = useFeeOnTransfer ? 'swapExactTokensForTokensSupportingFeeOnTransferTokens' : 'swapExactTokensForTokens'; // (uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
+          if (!trade.isPancakeSwap) {
+            methodName = useFeeOnTransfer ? 'swapExactTokensForTokensSupportingFeeOnTransferTokens' : 'swapExactTokensForTokens';
+          } else {
+            methodName = useFeeOnTransfer ? 'pancakeSwapExactTokensForTokensSupportingFeeOnTransferTokens' : 'pancakeSwapExactTokensForTokens';
+          } // (uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
+
 
           args = [amountIn, amountOut, path, to, deadline];
           value = ZERO_HEX;
@@ -1445,17 +1488,32 @@ var Router = /*#__PURE__*/function () {
         !!useFeeOnTransfer ? process.env.NODE_ENV !== "production" ? invariant(false, 'EXACT_OUT_FOT') : invariant(false) : void 0;
 
         if (etherIn) {
-          methodName = 'swapETHForExactTokens'; // (uint amountOut, address[] calldata path, address to, uint deadline)
+          if (!trade.isPancakeSwap) {
+            methodName = 'swapETHForExactTokens';
+          } else {
+            methodName = 'pancakeSwapETHForExactTokens';
+          } // (uint amountOut, address[] calldata path, address to, uint deadline)
+
 
           args = [amountOut, path, to, deadline];
           value = amountIn;
         } else if (etherOut) {
-          methodName = 'swapTokensForExactETH'; // (uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
+          if (!trade.isPancakeSwap) {
+            methodName = 'swapTokensForExactETH';
+          } else {
+            methodName = 'pancakeSwapTokensForExactETH';
+          } // (uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
+
 
           args = [amountOut, amountIn, path, to, deadline];
           value = ZERO_HEX;
         } else {
-          methodName = 'swapTokensForExactTokens'; // (uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
+          if (!trade.isPancakeSwap) {
+            methodName = 'swapTokensForExactTokens';
+          } else {
+            methodName = 'pancakeSwapTokensForExactTokens';
+          } // (uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
+
 
           args = [amountOut, amountIn, path, to, deadline];
           value = ZERO_HEX;
@@ -1584,5 +1642,5 @@ var Fetcher = /*#__PURE__*/function () {
   return Fetcher;
 }();
 
-export { ChainId, Currency, CurrencyAmount, ETHER, FACTORY_ADDRESS, Fetcher, Fraction, INIT_CODE_HASH, InsufficientInputAmountError, InsufficientReservesError, MINIMUM_LIQUIDITY, Pair, Percent, Price, Rounding, Route, Router, Token, TokenAmount, Trade, TradeType, WETH, currencyEquals, inputOutputComparator, tradeComparator };
+export { ChainId, Currency, CurrencyAmount, ETHER, FACTORY_ADDRESS, Fetcher, Fraction, INIT_CODE_HASH, InsufficientInputAmountError, InsufficientReservesError, MINIMUM_LIQUIDITY, Pair, Percent, Price, Rounding, Route, Router, Token, TokenAmount, Trade, TradeType, WETH, currencyEquals, inputOutputComparator, pancakeSwapWETH, tradeComparator };
 //# sourceMappingURL=sdk.esm.js.map
