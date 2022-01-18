@@ -85,19 +85,33 @@ export abstract class Router {
     switch (trade.tradeType) {
       case TradeType.EXACT_INPUT:
         if (etherIn) {
-          methodName = useFeeOnTransfer ? 'swapExactETHForTokensSupportingFeeOnTransferTokens' : 'swapExactETHForTokens'
+          if (!trade.isPancakeSwap) {
+            methodName = useFeeOnTransfer ? 'swapExactETHForTokensSupportingFeeOnTransferTokens' : 'swapExactETHForTokens'
+          } else {
+            methodName = useFeeOnTransfer ? 'pancakeSwapExactETHForTokensSupportingFeeOnTransferTokens' : 'pancakeSwapExactETHForTokens'
+          }
           // (uint amountOutMin, address[] calldata path, address to, uint deadline)
           args = [amountOut, path, to, deadline]
           value = amountIn
         } else if (etherOut) {
-          methodName = useFeeOnTransfer ? 'swapExactTokensForETHSupportingFeeOnTransferTokens' : 'swapExactTokensForETH'
+          if (!trade.isPancakeSwap) {
+            methodName = useFeeOnTransfer ? 'swapExactTokensForETHSupportingFeeOnTransferTokens' : 'swapExactTokensForETH'
+          } else {
+            methodName = useFeeOnTransfer ? 'pancakeSwapExactTokensForETHSupportingFeeOnTransferTokens' : 'pancakeSwapExactTokensForETH'
+          }
           // (uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
           args = [amountIn, amountOut, path, to, deadline]
           value = ZERO_HEX
         } else {
-          methodName = useFeeOnTransfer
-            ? 'swapExactTokensForTokensSupportingFeeOnTransferTokens'
-            : 'swapExactTokensForTokens'
+          if (!trade.isPancakeSwap) {
+            methodName = useFeeOnTransfer
+              ? 'swapExactTokensForTokensSupportingFeeOnTransferTokens'
+              : 'swapExactTokensForTokens'
+          } else {
+            methodName = useFeeOnTransfer
+              ? 'pancakeSwapExactTokensForTokensSupportingFeeOnTransferTokens'
+              : 'pancakeSwapExactTokensForTokens'
+          }
           // (uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
           args = [amountIn, amountOut, path, to, deadline]
           value = ZERO_HEX
@@ -106,17 +120,29 @@ export abstract class Router {
       case TradeType.EXACT_OUTPUT:
         invariant(!useFeeOnTransfer, 'EXACT_OUT_FOT')
         if (etherIn) {
-          methodName = 'swapETHForExactTokens'
+          if (!trade.isPancakeSwap) {
+            methodName = 'swapETHForExactTokens'
+          } else {
+            methodName = 'pancakeSwapETHForExactTokens'
+          }
           // (uint amountOut, address[] calldata path, address to, uint deadline)
           args = [amountOut, path, to, deadline]
           value = amountIn
         } else if (etherOut) {
-          methodName = 'swapTokensForExactETH'
+          if (!trade.isPancakeSwap) {
+            methodName = 'swapTokensForExactETH'
+          } else {
+            methodName = 'pancakeSwapTokensForExactETH'
+          }
           // (uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
           args = [amountOut, amountIn, path, to, deadline]
           value = ZERO_HEX
         } else {
-          methodName = 'swapTokensForExactTokens'
+          if (!trade.isPancakeSwap) {
+            methodName = 'swapTokensForExactTokens'
+          } else {
+            methodName = 'pancakeSwapTokensForExactTokens'
+          }
           // (uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
           args = [amountOut, amountIn, path, to, deadline]
           value = ZERO_HEX

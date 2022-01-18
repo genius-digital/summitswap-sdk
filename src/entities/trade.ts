@@ -10,7 +10,7 @@ import { Price } from './fractions/price'
 import { TokenAmount } from './fractions/tokenAmount'
 import { Pair } from './pair'
 import { Route } from './route'
-import { currencyEquals, Token, WETH } from './token'
+import { currencyEquals, Token, WETH, pancakeSwapWETH } from './token'
 
 /**
  * Returns the percent difference between the mid price and the execution price, i.e. price impact.
@@ -87,15 +87,21 @@ export interface BestTradeOptions {
  * In other words, if the currency is ETHER, returns the WETH token amount for the given chain. Otherwise, returns
  * the input currency amount.
  */
-function wrappedAmount(currencyAmount: CurrencyAmount, chainId: ChainId): TokenAmount {
+function wrappedAmount(currencyAmount: CurrencyAmount, chainId: ChainId, isPancakeSwap: boolean = false): TokenAmount {
   if (currencyAmount instanceof TokenAmount) return currencyAmount
-  if (currencyAmount.currency === ETHER) return new TokenAmount(WETH[chainId], currencyAmount.raw)
+  if (currencyAmount.currency === ETHER) {
+    const _WETH = !isPancakeSwap ? WETH[chainId] : pancakeSwapWETH[chainId]
+    return new TokenAmount(_WETH, currencyAmount.raw)
+  }
   invariant(false, 'CURRENCY')
 }
 
-function wrappedCurrency(currency: Currency, chainId: ChainId): Token {
+function wrappedCurrency(currency: Currency, chainId: ChainId, isPancakeSwap: boolean = false): Token {
   if (currency instanceof Token) return currency
-  if (currency === ETHER) return WETH[chainId]
+  if (currency === ETHER) {
+    const _WETH = !isPancakeSwap ? WETH[chainId] : pancakeSwapWETH[chainId]
+    return _WETH
+  }
   invariant(false, 'CURRENCY')
 }
 
@@ -133,6 +139,8 @@ export class Trade {
    */
   public readonly priceImpact: Percent
 
+  public readonly isPancakeSwap: boolean
+
   /**
    * Constructs an exact in trade with the given amount in and route
    * @param route route of the exact in trade
@@ -151,12 +159,12 @@ export class Trade {
     return new Trade(route, amountOut, TradeType.EXACT_OUTPUT)
   }
 
-  public constructor(route: Route, amount: CurrencyAmount, tradeType: TradeType) {
+  public constructor(route: Route, amount: CurrencyAmount, tradeType: TradeType, isPancakeSwap: boolean = false) {
     const amounts: TokenAmount[] = new Array(route.path.length)
     const nextPairs: Pair[] = new Array(route.pairs.length)
     if (tradeType === TradeType.EXACT_INPUT) {
       invariant(currencyEquals(amount.currency, route.input), 'INPUT')
-      amounts[0] = wrappedAmount(amount, route.chainId)
+      amounts[0] = wrappedAmount(amount, route.chainId, isPancakeSwap)
       for (let i = 0; i < route.path.length - 1; i++) {
         const pair = route.pairs[i]
         const [outputAmount, nextPair] = pair.getOutputAmount(amounts[i])
@@ -165,7 +173,7 @@ export class Trade {
       }
     } else {
       invariant(currencyEquals(amount.currency, route.output), 'OUTPUT')
-      amounts[amounts.length - 1] = wrappedAmount(amount, route.chainId)
+      amounts[amounts.length - 1] = wrappedAmount(amount, route.chainId, isPancakeSwap)
       for (let i = route.path.length - 1; i > 0; i--) {
         const pair = route.pairs[i - 1]
         const [inputAmount, nextPair] = pair.getInputAmount(amounts[i])
@@ -196,6 +204,7 @@ export class Trade {
     )
     this.nextMidPrice = Price.fromRoute(new Route(nextPairs, route.input))
     this.priceImpact = computePriceImpact(route.midPrice, this.inputAmount, this.outputAmount)
+    this.isPancakeSwap = isPancakeSwap
   }
 
   /**
@@ -255,8 +264,12 @@ export class Trade {
     // used in recursion.
     currentPairs: Pair[] = [],
     originalAmountIn: CurrencyAmount = currencyAmountIn,
-    bestTrades: Trade[] = []
+    bestTrades: Trade[] = [],
+    pancakeFactoryAddress?: string,
+    pancakeInitCodeHash?: string
   ): Trade[] {
+    const isPancakeSwap = Boolean(pancakeFactoryAddress && pancakeInitCodeHash)
+
     invariant(pairs.length > 0, 'PAIRS')
     invariant(maxHops > 0, 'MAX_HOPS')
     invariant(originalAmountIn === currencyAmountIn || currentPairs.length > 0, 'INVALID_RECURSION')
@@ -268,8 +281,8 @@ export class Trade {
         : undefined
     invariant(chainId !== undefined, 'CHAIN_ID')
 
-    const amountIn = wrappedAmount(currencyAmountIn, chainId)
-    const tokenOut = wrappedCurrency(currencyOut, chainId)
+    const amountIn = wrappedAmount(currencyAmountIn, chainId, isPancakeSwap)
+    const tokenOut = wrappedCurrency(currencyOut, chainId, isPancakeSwap)
     for (let i = 0; i < pairs.length; i++) {
       const pair = pairs[i]
       // pair irrelevant
@@ -293,7 +306,8 @@ export class Trade {
           new Trade(
             new Route([...currentPairs, pair], originalAmountIn.currency, currencyOut),
             originalAmountIn,
-            TradeType.EXACT_INPUT
+            TradeType.EXACT_INPUT,
+            isPancakeSwap
           ),
           maxNumResults,
           tradeComparator
@@ -312,7 +326,9 @@ export class Trade {
           },
           [...currentPairs, pair],
           originalAmountIn,
-          bestTrades
+          bestTrades,
+          pancakeFactoryAddress,
+          pancakeInitCodeHash
         )
       }
     }
@@ -343,8 +359,12 @@ export class Trade {
     // used in recursion.
     currentPairs: Pair[] = [],
     originalAmountOut: CurrencyAmount = currencyAmountOut,
-    bestTrades: Trade[] = []
+    bestTrades: Trade[] = [],
+    pancakeFactoryAddress?: string,
+    pancakeInitCodeHash?: string
   ): Trade[] {
+    const isPancakeSwap = Boolean(pancakeFactoryAddress && pancakeInitCodeHash)
+
     invariant(pairs.length > 0, 'PAIRS')
     invariant(maxHops > 0, 'MAX_HOPS')
     invariant(originalAmountOut === currencyAmountOut || currentPairs.length > 0, 'INVALID_RECURSION')
@@ -356,8 +376,8 @@ export class Trade {
         : undefined
     invariant(chainId !== undefined, 'CHAIN_ID')
 
-    const amountOut = wrappedAmount(currencyAmountOut, chainId)
-    const tokenIn = wrappedCurrency(currencyIn, chainId)
+    const amountOut = wrappedAmount(currencyAmountOut, chainId, isPancakeSwap)
+    const tokenIn = wrappedCurrency(currencyIn, chainId, isPancakeSwap)
     for (let i = 0; i < pairs.length; i++) {
       const pair = pairs[i]
       // pair irrelevant
@@ -381,7 +401,8 @@ export class Trade {
           new Trade(
             new Route([pair, ...currentPairs], currencyIn, originalAmountOut.currency),
             originalAmountOut,
-            TradeType.EXACT_OUTPUT
+            TradeType.EXACT_OUTPUT,
+            isPancakeSwap
           ),
           maxNumResults,
           tradeComparator
@@ -400,7 +421,9 @@ export class Trade {
           },
           [pair, ...currentPairs],
           originalAmountOut,
-          bestTrades
+          bestTrades,
+          pancakeFactoryAddress,
+          pancakeInitCodeHash
         )
       }
     }
