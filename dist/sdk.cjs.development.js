@@ -771,7 +771,6 @@ var Price = /*#__PURE__*/function (_Fraction) {
   return Price;
 }(Fraction);
 
-var PAIR_ADDRESS_CACHE = {};
 var Pair = /*#__PURE__*/function () {
   function Pair(tokenAmountA, tokenAmountB) {
     var tokenAmounts = tokenAmountA.token.sortsBefore(tokenAmountB.token) // does safety checks
@@ -781,8 +780,6 @@ var Pair = /*#__PURE__*/function () {
   }
 
   Pair.getAddress = function getAddress(tokenA, tokenB, factoryAddress, initCodeHash) {
-    var _PAIR_ADDRESS_CACHE, _PAIR_ADDRESS_CACHE$t;
-
     if (factoryAddress === void 0) {
       factoryAddress = FACTORY_ADDRESS;
     }
@@ -793,13 +790,20 @@ var Pair = /*#__PURE__*/function () {
 
     var tokens = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA]; // does safety checks
 
-    if (((_PAIR_ADDRESS_CACHE = PAIR_ADDRESS_CACHE) === null || _PAIR_ADDRESS_CACHE === void 0 ? void 0 : (_PAIR_ADDRESS_CACHE$t = _PAIR_ADDRESS_CACHE[tokens[0].address]) === null || _PAIR_ADDRESS_CACHE$t === void 0 ? void 0 : _PAIR_ADDRESS_CACHE$t[tokens[1].address]) === undefined) {
-      var _PAIR_ADDRESS_CACHE2, _extends2, _extends3;
-
-      PAIR_ADDRESS_CACHE = _extends({}, PAIR_ADDRESS_CACHE, (_extends3 = {}, _extends3[tokens[0].address] = _extends({}, (_PAIR_ADDRESS_CACHE2 = PAIR_ADDRESS_CACHE) === null || _PAIR_ADDRESS_CACHE2 === void 0 ? void 0 : _PAIR_ADDRESS_CACHE2[tokens[0].address], (_extends2 = {}, _extends2[tokens[1].address] = address.getCreate2Address(factoryAddress, solidity.keccak256(['bytes'], [solidity.pack(['address', 'address'], [tokens[0].address, tokens[1].address])]), initCodeHash), _extends2)), _extends3));
-    }
-
-    return PAIR_ADDRESS_CACHE[tokens[0].address][tokens[1].address];
+    return address.getCreate2Address(factoryAddress, solidity.keccak256(['bytes'], [solidity.pack(['address', 'address'], [tokens[0].address, tokens[1].address])]), initCodeHash); // if (PAIR_ADDRESS_CACHE?.[tokens[0].address]?.[tokens[1].address] === undefined) {
+    //   PAIR_ADDRESS_CACHE = {
+    //     ...PAIR_ADDRESS_CACHE,
+    //     [tokens[0].address]: {
+    //       ...PAIR_ADDRESS_CACHE?.[tokens[0].address],
+    //       [tokens[1].address]: getCreate2Address(
+    //         factoryAddress,
+    //         keccak256(['bytes'], [pack(['address', 'address'], [tokens[0].address, tokens[1].address])]),
+    //         initCodeHash
+    //       )
+    //     }
+    //   }
+    // }
+    // return PAIR_ADDRESS_CACHE[tokens[0].address][tokens[1].address]
   }
   /**
    * Returns true if the token is either token0 or token1
