@@ -53,7 +53,7 @@ export class Pair {
       }
     }
 
-    return PAIR_ADDRESS_CACHE[FACTORY_ADDRESS][tokens[0].address][tokens[1].address]
+    return PAIR_ADDRESS_CACHE[factoryAddress][tokens[0].address][tokens[1].address]
   }
 
   public constructor(tokenAmountA: TokenAmount, tokenAmountB: TokenAmount) {
