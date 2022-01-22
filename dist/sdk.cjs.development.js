@@ -799,7 +799,7 @@ var Pair = /*#__PURE__*/function () {
       PAIR_ADDRESS_CACHE = _extends({}, PAIR_ADDRESS_CACHE, (_extends4 = {}, _extends4[factoryAddress] = _extends({}, (_PAIR_ADDRESS_CACHE2 = PAIR_ADDRESS_CACHE) === null || _PAIR_ADDRESS_CACHE2 === void 0 ? void 0 : _PAIR_ADDRESS_CACHE2[factoryAddress], (_extends3 = {}, _extends3[tokens[0].address] = _extends({}, (_PAIR_ADDRESS_CACHE3 = PAIR_ADDRESS_CACHE) === null || _PAIR_ADDRESS_CACHE3 === void 0 ? void 0 : (_PAIR_ADDRESS_CACHE3$ = _PAIR_ADDRESS_CACHE3[factoryAddress]) === null || _PAIR_ADDRESS_CACHE3$ === void 0 ? void 0 : _PAIR_ADDRESS_CACHE3$[tokens[0].address], (_extends2 = {}, _extends2[tokens[1].address] = address.getCreate2Address(factoryAddress, solidity.keccak256(['bytes'], [solidity.pack(['address', 'address'], [tokens[0].address, tokens[1].address])]), initCodeHash), _extends2)), _extends3)), _extends4));
     }
 
-    return PAIR_ADDRESS_CACHE[FACTORY_ADDRESS][tokens[0].address][tokens[1].address];
+    return PAIR_ADDRESS_CACHE[factoryAddress][tokens[0].address][tokens[1].address];
   }
   /**
    * Returns true if the token is either token0 or token1
