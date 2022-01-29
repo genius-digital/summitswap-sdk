@@ -1126,7 +1126,7 @@ function wrappedCurrency(currency, chainId) {
 
 
 var Trade = /*#__PURE__*/function () {
-  function Trade(route, amount, tradeType) {
+  function Trade(route, factory, amount, tradeType) {
     var amounts = new Array(route.path.length);
     var nextPairs = new Array(route.pairs.length);
 
@@ -1161,6 +1161,7 @@ var Trade = /*#__PURE__*/function () {
     }
 
     this.route = route;
+    this.factory = factory;
     this.tradeType = tradeType;
     this.inputAmount = tradeType === exports.TradeType.EXACT_INPUT ? amount : route.input === ETHER ? CurrencyAmount.ether(amounts[0].raw) : amounts[0];
     this.outputAmount = tradeType === exports.TradeType.EXACT_OUTPUT ? amount : route.output === ETHER ? CurrencyAmount.ether(amounts[amounts.length - 1].raw) : amounts[amounts.length - 1];
@@ -1176,7 +1177,7 @@ var Trade = /*#__PURE__*/function () {
 
 
   Trade.exactIn = function exactIn(route, amountIn) {
-    return new Trade(route, amountIn, exports.TradeType.EXACT_INPUT);
+    return new Trade(route, "", amountIn, exports.TradeType.EXACT_INPUT);
   }
   /**
    * Constructs an exact out trade with the given amount out and route
@@ -1186,7 +1187,7 @@ var Trade = /*#__PURE__*/function () {
   ;
 
   Trade.exactOut = function exactOut(route, amountOut) {
-    return new Trade(route, amountOut, exports.TradeType.EXACT_OUTPUT);
+    return new Trade(route, "", amountOut, exports.TradeType.EXACT_OUTPUT);
   }
   /**
    * Get the minimum amount that must be received from this trade for the given slippage tolerance
@@ -1239,7 +1240,7 @@ var Trade = /*#__PURE__*/function () {
   ;
 
   Trade.bestTradeExactIn = function bestTradeExactIn(pairs, currencyAmountIn, currencyOut, _temp, // used in recursion.
-  currentPairs, originalAmountIn, bestTrades) {
+  currentPairs, originalAmountIn, bestTrades, factory) {
     var _ref = _temp === void 0 ? {} : _temp,
         _ref$maxNumResults = _ref.maxNumResults,
         maxNumResults = _ref$maxNumResults === void 0 ? 3 : _ref$maxNumResults,
@@ -1290,14 +1291,14 @@ var Trade = /*#__PURE__*/function () {
 
 
       if (amountOut.token.equals(tokenOut)) {
-        sortedInsert(bestTrades, new Trade(new Route([].concat(currentPairs, [pair]), originalAmountIn.currency, currencyOut), originalAmountIn, exports.TradeType.EXACT_INPUT), maxNumResults, tradeComparator);
+        sortedInsert(bestTrades, new Trade(new Route([].concat(currentPairs, [pair]), originalAmountIn.currency, currencyOut), factory, originalAmountIn, exports.TradeType.EXACT_INPUT), maxNumResults, tradeComparator);
       } else if (maxHops > 1 && pairs.length > 1) {
         var pairsExcludingThisPair = pairs.slice(0, i).concat(pairs.slice(i + 1, pairs.length)); // otherwise, consider all the other paths that lead from this token as long as we have not exceeded maxHops
 
         Trade.bestTradeExactIn(pairsExcludingThisPair, amountOut, currencyOut, {
           maxNumResults: maxNumResults,
           maxHops: maxHops - 1
-        }, [].concat(currentPairs, [pair]), originalAmountIn, bestTrades);
+        }, [].concat(currentPairs, [pair]), originalAmountIn, bestTrades, factory);
       }
     }
 
@@ -1321,7 +1322,7 @@ var Trade = /*#__PURE__*/function () {
   ;
 
   Trade.bestTradeExactOut = function bestTradeExactOut(pairs, currencyIn, currencyAmountOut, _temp2, // used in recursion.
-  currentPairs, originalAmountOut, bestTrades) {
+  currentPairs, originalAmountOut, bestTrades, factory) {
     var _ref2 = _temp2 === void 0 ? {} : _temp2,
         _ref2$maxNumResults = _ref2.maxNumResults,
         maxNumResults = _ref2$maxNumResults === void 0 ? 3 : _ref2$maxNumResults,
@@ -1372,14 +1373,14 @@ var Trade = /*#__PURE__*/function () {
 
 
       if (amountIn.token.equals(tokenIn)) {
-        sortedInsert(bestTrades, new Trade(new Route([pair].concat(currentPairs), currencyIn, originalAmountOut.currency), originalAmountOut, exports.TradeType.EXACT_OUTPUT), maxNumResults, tradeComparator);
+        sortedInsert(bestTrades, new Trade(new Route([pair].concat(currentPairs), currencyIn, originalAmountOut.currency), factory, originalAmountOut, exports.TradeType.EXACT_OUTPUT), maxNumResults, tradeComparator);
       } else if (maxHops > 1 && pairs.length > 1) {
         var pairsExcludingThisPair = pairs.slice(0, i).concat(pairs.slice(i + 1, pairs.length)); // otherwise, consider all the other paths that arrive at this token as long as we have not exceeded maxHops
 
         Trade.bestTradeExactOut(pairsExcludingThisPair, currencyIn, amountIn, {
           maxNumResults: maxNumResults,
           maxHops: maxHops - 1
-        }, [pair].concat(currentPairs), originalAmountOut, bestTrades);
+        }, [pair].concat(currentPairs), originalAmountOut, bestTrades, factory);
       }
     }
 

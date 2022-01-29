@@ -25,6 +25,10 @@ export declare class Trade {
      */
     readonly route: Route;
     /**
+     * The route of the factory, i.e. which pairs the trade goes through.
+     */
+    readonly factory: string;
+    /**
      * The type of the trade, either exact in or exact out.
      */
     readonly tradeType: TradeType;
@@ -60,7 +64,7 @@ export declare class Trade {
      * @param amountOut the amount returned by the trade
      */
     static exactOut(route: Route, amountOut: CurrencyAmount): Trade;
-    constructor(route: Route, amount: CurrencyAmount, tradeType: TradeType);
+    constructor(route: Route, factory: string, amount: CurrencyAmount, tradeType: TradeType);
     /**
      * Get the minimum amount that must be received from this trade for the given slippage tolerance
      * @param slippageTolerance tolerance of unfavorable slippage from the execution price of this trade
@@ -85,7 +89,7 @@ export declare class Trade {
      * @param originalAmountIn used in recursion; the original value of the currencyAmountIn parameter
      * @param bestTrades used in recursion; the current list of best trades
      */
-    static bestTradeExactIn(pairs: Pair[], currencyAmountIn: CurrencyAmount, currencyOut: Currency, { maxNumResults, maxHops }?: BestTradeOptions, currentPairs?: Pair[], originalAmountIn?: CurrencyAmount, bestTrades?: Trade[]): Trade[];
+    static bestTradeExactIn(pairs: Pair[], currencyAmountIn: CurrencyAmount, currencyOut: Currency, { maxNumResults, maxHops }: BestTradeOptions | undefined, currentPairs: Pair[] | undefined, originalAmountIn: CurrencyAmount | undefined, bestTrades: Trade[] | undefined, factory: string): Trade[];
     /**
      * similar to the above method but instead targets a fixed output amount
      * given a list of pairs, and a fixed amount out, returns the top `maxNumResults` trades that go from an input token
@@ -101,6 +105,6 @@ export declare class Trade {
      * @param originalAmountOut used in recursion; the original value of the currencyAmountOut parameter
      * @param bestTrades used in recursion; the current list of best trades
      */
-    static bestTradeExactOut(pairs: Pair[], currencyIn: Currency, currencyAmountOut: CurrencyAmount, { maxNumResults, maxHops }?: BestTradeOptions, currentPairs?: Pair[], originalAmountOut?: CurrencyAmount, bestTrades?: Trade[]): Trade[];
+    static bestTradeExactOut(pairs: Pair[], currencyIn: Currency, currencyAmountOut: CurrencyAmount, { maxNumResults, maxHops }: BestTradeOptions | undefined, currentPairs: Pair[] | undefined, originalAmountOut: CurrencyAmount | undefined, bestTrades: Trade[] | undefined, factory: string): Trade[];
 }
 export {};
