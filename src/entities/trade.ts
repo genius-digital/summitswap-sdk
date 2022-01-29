@@ -109,6 +109,10 @@ export class Trade {
    */
   public readonly route: Route
   /**
+   * The route of the factory, i.e. which pairs the trade goes through.
+   */
+  public readonly factory: string
+  /**
    * The type of the trade, either exact in or exact out.
    */
   public readonly tradeType: TradeType
@@ -139,7 +143,7 @@ export class Trade {
    * @param amountIn the amount being passed in
    */
   public static exactIn(route: Route, amountIn: CurrencyAmount): Trade {
-    return new Trade(route, amountIn, TradeType.EXACT_INPUT)
+    return new Trade(route, "", amountIn, TradeType.EXACT_INPUT)
   }
 
   /**
@@ -148,10 +152,10 @@ export class Trade {
    * @param amountOut the amount returned by the trade
    */
   public static exactOut(route: Route, amountOut: CurrencyAmount): Trade {
-    return new Trade(route, amountOut, TradeType.EXACT_OUTPUT)
+    return new Trade(route, "", amountOut, TradeType.EXACT_OUTPUT)
   }
 
-  public constructor(route: Route, amount: CurrencyAmount, tradeType: TradeType) {
+  public constructor(route: Route, factory: string, amount: CurrencyAmount, tradeType: TradeType) {
     const amounts: TokenAmount[] = new Array(route.path.length)
     const nextPairs: Pair[] = new Array(route.pairs.length)
     if (tradeType === TradeType.EXACT_INPUT) {
@@ -175,6 +179,7 @@ export class Trade {
     }
 
     this.route = route
+    this.factory = factory
     this.tradeType = tradeType
     this.inputAmount =
       tradeType === TradeType.EXACT_INPUT
@@ -255,7 +260,8 @@ export class Trade {
     // used in recursion.
     currentPairs: Pair[] = [],
     originalAmountIn: CurrencyAmount = currencyAmountIn,
-    bestTrades: Trade[] = []
+    bestTrades: Trade[] = [],
+    factory: string
   ): Trade[] {
     invariant(pairs.length > 0, 'PAIRS')
     invariant(maxHops > 0, 'MAX_HOPS')
@@ -292,6 +298,7 @@ export class Trade {
           bestTrades,
           new Trade(
             new Route([...currentPairs, pair], originalAmountIn.currency, currencyOut),
+            factory,
             originalAmountIn,
             TradeType.EXACT_INPUT
           ),
@@ -312,7 +319,8 @@ export class Trade {
           },
           [...currentPairs, pair],
           originalAmountIn,
-          bestTrades
+          bestTrades,
+          factory
         )
       }
     }
@@ -343,7 +351,8 @@ export class Trade {
     // used in recursion.
     currentPairs: Pair[] = [],
     originalAmountOut: CurrencyAmount = currencyAmountOut,
-    bestTrades: Trade[] = []
+    bestTrades: Trade[] = [],
+    factory: string
   ): Trade[] {
     invariant(pairs.length > 0, 'PAIRS')
     invariant(maxHops > 0, 'MAX_HOPS')
@@ -380,6 +389,7 @@ export class Trade {
           bestTrades,
           new Trade(
             new Route([pair, ...currentPairs], currencyIn, originalAmountOut.currency),
+            factory,
             originalAmountOut,
             TradeType.EXACT_OUTPUT
           ),
@@ -400,7 +410,8 @@ export class Trade {
           },
           [pair, ...currentPairs],
           originalAmountOut,
-          bestTrades
+          bestTrades,
+          factory
         )
       }
     }
