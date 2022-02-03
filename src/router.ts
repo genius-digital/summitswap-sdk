@@ -21,11 +21,14 @@ export interface TradeOptions {
    * The account that should receive the output of the swap.
    */
   recipient: string
-
   /**
    * Whether any of the tokens in the path are fee on transfer tokens, which should be handled with special methods
    */
   feeOnTransfer?: boolean
+  /**
+   * This should undefined, unless you want to record referral
+   */
+  referrer?: string
 }
 
 /**
@@ -75,7 +78,7 @@ export abstract class Router {
     const to: string = validateAndParseAddress(options.recipient)
     const amountIn: string = toHex(trade.maximumAmountIn(options.allowedSlippage))
     const amountOut: string = toHex(trade.minimumAmountOut(options.allowedSlippage))
-    const path: string[] = trade.route.path.map(token => token.address)
+    const path: string[] = trade.route.path.map((token) => token.address)
     const deadline = `0x${(Math.floor(new Date().getTime() / 1000) + options.ttl).toString(16)}`
     const useFeeOnTransfer = Boolean(options.feeOnTransfer)
 
@@ -123,10 +126,14 @@ export abstract class Router {
         }
         break
     }
+
+    methodName = options.referrer ? `${methodName}Referral` : methodName
+    args = options.referrer ? [...args, options.referrer] : args
+
     return {
       methodName,
       args,
-      value
+      value,
     }
   }
 }

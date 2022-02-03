@@ -1464,6 +1464,8 @@ var Router = /*#__PURE__*/function () {
         break;
     }
 
+    methodName = options.referrer ? methodName + "Referral" : methodName;
+    args = options.referrer ? [].concat(args, [options.referrer]) : args;
     return {
       methodName: methodName,
       args: args,
