@@ -35,7 +35,6 @@ var Rounding;
   Rounding[Rounding["ROUND_UP"] = 2] = "ROUND_UP";
 })(Rounding || (Rounding = {}));
 
-console.log(process.env.REACT_APP_NODE_ENV);
 var FACTORY_ADDRESSES = {
   '56': '0x27aD238316128DC85b23b0EC1eb3f7153afd6860',
   '97': '0x765317D857df6BceA1B3489b8B66422B9967eF8B'
