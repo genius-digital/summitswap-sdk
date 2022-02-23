@@ -1609,4 +1609,4 @@ exports.WETH = WETH;
 exports.currencyEquals = currencyEquals;
 exports.inputOutputComparator = inputOutputComparator;
 exports.tradeComparator = tradeComparator;
-//# sourceMappingURL=sdk.cjs.development.js.map
+//# sourceMappingURL=summitswap-sdk.cjs.development.js.map

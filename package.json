@@ -1,5 +1,5 @@
 {
-  "name": "@summitswap/sdk",
+  "name": "@koda-finance/summitswap-sdk",
   "license": "MIT",
   "version": "1.0.0",
   "description": "🛠 An SDK for building applications on top of summitswap.",
