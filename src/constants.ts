@@ -19,8 +19,6 @@ export enum Rounding {
   ROUND_UP
 }
 
-console.log(process.env.REACT_APP_NODE_ENV)
-
 export const FACTORY_ADDRESSES = {
   '56': '0x7067079bc460d2c5984cC89008786fE46839FCF0',
   '97': '0x765317D857df6BceA1B3489b8B66422B9967eF8B'
