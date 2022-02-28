@@ -1,7 +1,6 @@
 {
-  "name": "@summitswap-libs/sdk",
-  "license": "MIT",
-  "version": "1.0.0",
+  "name": "@koda-finance/summitswap-sdk",
+  "version": "1.0.3",
   "description": "🛠 An SDK for building applications on top of summitswap.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -13,6 +12,8 @@
     "ethereum"
   ],
   "module": "dist/sdk.esm.js",
+  "repository": "https://github.com/Koda-Finance/summitswap-sdk",
+  "license": "MIT",
   "scripts": {
     "lint": "tsdx lint src test",
     "lint:fix": "tsdx lint src test --fix",
