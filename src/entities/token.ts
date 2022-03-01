@@ -11,7 +11,8 @@ export class Token extends Currency {
   public readonly address: string
   public readonly priority: number
   public readonly referralEnabled: boolean
-  public readonly slippageTolerance: number
+  public readonly buySlippageTolerance: number
+  public readonly sellSlippageTolerance: number
 
   public constructor(
     chainId: ChainId,
@@ -21,13 +22,15 @@ export class Token extends Currency {
     name?: string,
     priority = 0,
     referralEnabled = false,
-    slippageTolerance = 0
+    buySlippageTolerance = 0,
+    sellSlippageTolerance = 0
   ) {
     super(decimals, symbol, name)
     this.chainId = chainId
     this.priority = priority
     this.referralEnabled = referralEnabled
-    this.slippageTolerance = slippageTolerance
+    this.buySlippageTolerance = buySlippageTolerance
+    this.sellSlippageTolerance = sellSlippageTolerance
     this.address = validateAndParseAddress(address)
   }
 
