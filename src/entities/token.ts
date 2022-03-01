@@ -13,7 +13,16 @@ export class Token extends Currency {
   public readonly referralEnabled: boolean
   public readonly slippageTolerance: number
 
-  public constructor(chainId: ChainId, address: string, decimals: number, symbol?: string, name?: string, priority = 0, referralEnabled = false, slippageTolerance = 0) {
+  public constructor(
+    chainId: ChainId,
+    address: string,
+    decimals: number,
+    symbol?: string,
+    name?: string,
+    priority = 0,
+    referralEnabled = false,
+    slippageTolerance = 0
+  ) {
     super(decimals, symbol, name)
     this.chainId = chainId
     this.priority = priority
