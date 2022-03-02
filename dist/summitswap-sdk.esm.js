@@ -387,7 +387,7 @@ var _WETH;
 var Token = /*#__PURE__*/function (_Currency) {
   _inheritsLoose(Token, _Currency);
 
-  function Token(chainId, address, decimals, symbol, name, priority, referralEnabled) {
+  function Token(chainId, address, decimals, symbol, name, priority, referralEnabled, buySlippageTolerance, sellSlippageTolerance) {
     var _this;
 
     if (priority === void 0) {
@@ -398,10 +398,20 @@ var Token = /*#__PURE__*/function (_Currency) {
       referralEnabled = false;
     }
 
+    if (buySlippageTolerance === void 0) {
+      buySlippageTolerance = 0;
+    }
+
+    if (sellSlippageTolerance === void 0) {
+      sellSlippageTolerance = 0;
+    }
+
     _this = _Currency.call(this, decimals, symbol, name) || this;
     _this.chainId = chainId;
     _this.priority = priority;
     _this.referralEnabled = referralEnabled;
+    _this.buySlippageTolerance = buySlippageTolerance;
+    _this.sellSlippageTolerance = sellSlippageTolerance;
     _this.address = validateAndParseAddress(address);
     return _this;
   }
