@@ -1417,7 +1417,6 @@ var Router = /*#__PURE__*/function () {
 
     !!(etherIn && etherOut) ? process.env.NODE_ENV !== "production" ? invariant(false, 'ETHER_IN_OUT') : invariant(false) : void 0;
     !(options.ttl > 0) ? process.env.NODE_ENV !== "production" ? invariant(false, 'TTL') : invariant(false) : void 0;
-    var factory = validateAndParseAddress(trade.factory);
     var to = validateAndParseAddress(options.recipient);
     var amountIn = toHex(trade.maximumAmountIn(options.allowedSlippage));
     var amountOut = toHex(trade.minimumAmountOut(options.allowedSlippage));
@@ -1435,17 +1434,17 @@ var Router = /*#__PURE__*/function () {
         if (etherIn) {
           methodName = useFeeOnTransfer ? 'swapExactETHForTokensSupportingFeeOnTransferTokens' : 'swapExactETHForTokens'; // (uint amountOutMin, address[] calldata path, address to, uint deadline)
 
-          args = [factory, amountOut, path, to, deadline];
+          args = [amountOut, path, to, deadline];
           value = amountIn;
         } else if (etherOut) {
           methodName = useFeeOnTransfer ? 'swapExactTokensForETHSupportingFeeOnTransferTokens' : 'swapExactTokensForETH'; // (uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
 
-          args = [factory, amountIn, amountOut, path, to, deadline];
+          args = [amountIn, amountOut, path, to, deadline];
           value = ZERO_HEX;
         } else {
           methodName = useFeeOnTransfer ? 'swapExactTokensForTokensSupportingFeeOnTransferTokens' : 'swapExactTokensForTokens'; // (uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
 
-          args = [factory, amountIn, amountOut, path, to, deadline];
+          args = [amountIn, amountOut, path, to, deadline];
           value = ZERO_HEX;
         }
 
@@ -1457,17 +1456,17 @@ var Router = /*#__PURE__*/function () {
         if (etherIn) {
           methodName = 'swapETHForExactTokens'; // (uint amountOut, address[] calldata path, address to, uint deadline)
 
-          args = [factory, amountOut, path, to, deadline];
+          args = [amountOut, path, to, deadline];
           value = amountIn;
         } else if (etherOut) {
           methodName = 'swapTokensForExactETH'; // (uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
 
-          args = [factory, amountOut, amountIn, path, to, deadline];
+          args = [amountOut, amountIn, path, to, deadline];
           value = ZERO_HEX;
         } else {
           methodName = 'swapTokensForExactTokens'; // (uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
 
-          args = [factory, amountOut, amountIn, path, to, deadline];
+          args = [amountOut, amountIn, path, to, deadline];
           value = ZERO_HEX;
         }
 
