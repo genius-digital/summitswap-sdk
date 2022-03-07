@@ -11,12 +11,26 @@ export class Token extends Currency {
   public readonly address: string
   public readonly priority: number
   public readonly referralEnabled: boolean
+  public readonly buySlippageTolerance: number
+  public readonly sellSlippageTolerance: number
 
-  public constructor(chainId: ChainId, address: string, decimals: number, symbol?: string, name?: string, priority = 0, referralEnabled = false) {
+  public constructor(
+    chainId: ChainId,
+    address: string,
+    decimals: number,
+    symbol?: string,
+    name?: string,
+    priority = 0,
+    referralEnabled = false,
+    buySlippageTolerance = 0,
+    sellSlippageTolerance = 0
+  ) {
     super(decimals, symbol, name)
     this.chainId = chainId
     this.priority = priority
     this.referralEnabled = referralEnabled
+    this.buySlippageTolerance = buySlippageTolerance
+    this.sellSlippageTolerance = sellSlippageTolerance
     this.address = validateAndParseAddress(address)
   }
 
@@ -70,7 +84,7 @@ export const WETH = {
   ),
   [ChainId.BSCTESTNET]: new Token(
     ChainId.BSCTESTNET,
-    '0xae13d989dac2f0debff460ac112a837c89baa7cd',
+    '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
     18,
     'WBNB',
     'Wrapped BNB'

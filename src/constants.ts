@@ -19,10 +19,8 @@ export enum Rounding {
   ROUND_UP
 }
 
-console.log(process.env.REACT_APP_NODE_ENV)
-
 export const FACTORY_ADDRESSES = {
-  '56': '0x27aD238316128DC85b23b0EC1eb3f7153afd6860',
+  '56': '0x7067079bc460d2c5984cC89008786fE46839FCF0',
   '97': '0x765317D857df6BceA1B3489b8B66422B9967eF8B'
 } as {
   [key: string]: string
@@ -33,7 +31,7 @@ export const FACTORY_ADDRESS: string =
   process.env.REACT_APP_FACTORY_ADDRESS || FACTORY_ADDRESSES[process.env.REACT_APP_CHAIN_ID as string]
 
 export const INIT_CODE_HASHES = {
-  '56': '0xfe604490e88884eee0a2ef7362417e3771d067dc74cd2e605d0b3e1e90f300cb',
+  '56': '0x62107283605281eee5af96c604a5ce1219d62f714a93ce98f5837b27c19b698c',
   '97': '0xfe604490e88884eee0a2ef7362417e3771d067dc74cd2e605d0b3e1e90f300cb'
 } as {
   [key: string]: string
