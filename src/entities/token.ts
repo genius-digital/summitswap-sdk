@@ -13,7 +13,7 @@ export class Token extends Currency {
   public readonly referralEnabled: boolean
   public readonly buySlippageTolerance: number
   public readonly sellSlippageTolerance: number
-  public readonly coingeckoId
+  public readonly coingeckoId?: string
 
   public constructor(
     chainId: ChainId,
