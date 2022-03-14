@@ -387,7 +387,7 @@ var _WETH;
 var Token = /*#__PURE__*/function (_Currency) {
   _inheritsLoose(Token, _Currency);
 
-  function Token(chainId, address, decimals, symbol, name, priority, referralEnabled, buySlippageTolerance, sellSlippageTolerance) {
+  function Token(chainId, address, decimals, symbol, name, priority, referralEnabled, buySlippageTolerance, sellSlippageTolerance, coingeckoId) {
     var _this;
 
     if (priority === void 0) {
@@ -412,6 +412,7 @@ var Token = /*#__PURE__*/function (_Currency) {
     _this.referralEnabled = referralEnabled;
     _this.buySlippageTolerance = buySlippageTolerance;
     _this.sellSlippageTolerance = sellSlippageTolerance;
+    _this.coingeckoId = coingeckoId;
     _this.address = validateAndParseAddress(address);
     return _this;
   }
