@@ -24,8 +24,8 @@ export class Token extends Currency {
     priority = 0,
     referralEnabled = false,
     buySlippageTolerance = 0,
-    allowSellMax = true,
-    sellSlippageTolerance = 0
+    sellSlippageTolerance = 0,
+    allowSellMax = true
   ) {
     super(decimals, symbol, name)
     this.chainId = chainId
