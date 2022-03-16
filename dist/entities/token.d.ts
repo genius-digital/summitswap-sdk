@@ -11,7 +11,7 @@ export declare class Token extends Currency {
     readonly buySlippageTolerance: number;
     readonly sellSlippageTolerance: number;
     readonly allowSellMax: boolean;
-    constructor(chainId: ChainId, address: string, decimals: number, symbol?: string, name?: string, priority?: number, referralEnabled?: boolean, buySlippageTolerance?: number, allowSellMax?: boolean, sellSlippageTolerance?: number);
+    constructor(chainId: ChainId, address: string, decimals: number, symbol?: string, name?: string, priority?: number, referralEnabled?: boolean, buySlippageTolerance?: number, sellSlippageTolerance?: number, allowSellMax?: boolean);
     /**
      * Returns true if the two tokens are equivalent, i.e. have the same chainId and address.
      * @param other other token to compare

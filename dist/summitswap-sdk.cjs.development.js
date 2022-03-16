@@ -387,7 +387,7 @@ var _WETH;
 var Token = /*#__PURE__*/function (_Currency) {
   _inheritsLoose(Token, _Currency);
 
-  function Token(chainId, address, decimals, symbol, name, priority, referralEnabled, buySlippageTolerance, allowSellMax, sellSlippageTolerance) {
+  function Token(chainId, address, decimals, symbol, name, priority, referralEnabled, buySlippageTolerance, sellSlippageTolerance, allowSellMax) {
     var _this;
 
     if (priority === void 0) {
@@ -402,12 +402,12 @@ var Token = /*#__PURE__*/function (_Currency) {
       buySlippageTolerance = 0;
     }
 
-    if (allowSellMax === void 0) {
-      allowSellMax = true;
-    }
-
     if (sellSlippageTolerance === void 0) {
       sellSlippageTolerance = 0;
+    }
+
+    if (allowSellMax === void 0) {
+      allowSellMax = true;
     }
 
     _this = _Currency.call(this, decimals, symbol, name) || this;
