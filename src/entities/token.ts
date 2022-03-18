@@ -13,8 +13,9 @@ export class Token extends Currency {
   public readonly referralEnabled: boolean
   public readonly buySlippageTolerance: number
   public readonly sellSlippageTolerance: number
+  public readonly coingeckoId?: string
   public readonly allowSellMax: boolean
-
+  
   public constructor(
     chainId: ChainId,
     address: string,
@@ -25,6 +26,7 @@ export class Token extends Currency {
     referralEnabled = false,
     buySlippageTolerance = 0,
     sellSlippageTolerance = 0,
+    coingeckoId?: string,
     allowSellMax = true
   ) {
     super(decimals, symbol, name)
@@ -33,6 +35,7 @@ export class Token extends Currency {
     this.referralEnabled = referralEnabled
     this.buySlippageTolerance = buySlippageTolerance
     this.sellSlippageTolerance = sellSlippageTolerance
+    this.coingeckoId = coingeckoId
     this.allowSellMax = allowSellMax
     this.address = validateAndParseAddress(address)
   }
