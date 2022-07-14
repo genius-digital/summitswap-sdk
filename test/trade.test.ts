@@ -10,7 +10,7 @@ import {
   TokenAmount,
   Trade,
   TradeType,
-  WETH
+  WETH,
 } from '../src'
 
 describe('Trade', () => {
@@ -35,6 +35,7 @@ describe('Trade', () => {
   it('can be constructed with ETHER as input', () => {
     const trade = new Trade(
       new Route([pair_weth_0], ETHER),
+      undefined,
       CurrencyAmount.ether(JSBI.BigInt(100)),
       TradeType.EXACT_INPUT
     )
@@ -44,6 +45,7 @@ describe('Trade', () => {
   it('can be constructed with ETHER as input for exact output', () => {
     const trade = new Trade(
       new Route([pair_weth_0], ETHER, token0),
+      undefined,
       new TokenAmount(token0, JSBI.BigInt(100)),
       TradeType.EXACT_OUTPUT
     )
@@ -54,6 +56,7 @@ describe('Trade', () => {
   it('can be constructed with ETHER as output', () => {
     const trade = new Trade(
       new Route([pair_weth_0], token0, ETHER),
+      undefined,
       CurrencyAmount.ether(JSBI.BigInt(100)),
       TradeType.EXACT_OUTPUT
     )
@@ -63,6 +66,7 @@ describe('Trade', () => {
   it('can be constructed with ETHER as output for exact input', () => {
     const trade = new Trade(
       new Route([pair_weth_0], token0, ETHER),
+      undefined,
       new TokenAmount(token0, JSBI.BigInt(100)),
       TradeType.EXACT_INPUT
     )
@@ -181,6 +185,7 @@ describe('Trade', () => {
     describe('tradeType = EXACT_INPUT', () => {
       const exactIn = new Trade(
         new Route([pair_0_1, pair_1_2], token0),
+        undefined,
         new TokenAmount(token0, JSBI.BigInt(100)),
         TradeType.EXACT_INPUT
       )
@@ -207,6 +212,7 @@ describe('Trade', () => {
     describe('tradeType = EXACT_OUTPUT', () => {
       const exactOut = new Trade(
         new Route([pair_0_1, pair_1_2], token0),
+        undefined,
         new TokenAmount(token2, JSBI.BigInt(100)),
         TradeType.EXACT_OUTPUT
       )
@@ -237,6 +243,7 @@ describe('Trade', () => {
     describe('tradeType = EXACT_INPUT', () => {
       const exactIn = new Trade(
         new Route([pair_0_1, pair_1_2], token0),
+        undefined,
         new TokenAmount(token0, JSBI.BigInt(100)),
         TradeType.EXACT_INPUT
       )
@@ -263,6 +270,7 @@ describe('Trade', () => {
     describe('tradeType = EXACT_OUTPUT', () => {
       const exactOut = new Trade(
         new Route([pair_0_1, pair_1_2], token0),
+        undefined,
         new TokenAmount(token2, JSBI.BigInt(100)),
         TradeType.EXACT_OUTPUT
       )
