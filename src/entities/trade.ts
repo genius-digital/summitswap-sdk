@@ -111,7 +111,7 @@ export class Trade {
   /**
    * The route of the factory, i.e. which pairs the trade goes through.
    */
-  public readonly factory: string
+  public readonly factory: string | undefined
   /**
    * The type of the trade, either exact in or exact out.
    */
@@ -155,7 +155,7 @@ export class Trade {
     return new Trade(route, "", amountOut, TradeType.EXACT_OUTPUT)
   }
 
-  public constructor(route: Route, factory: string, amount: CurrencyAmount, tradeType: TradeType) {
+  public constructor(route: Route, factory: string | undefined, amount: CurrencyAmount, tradeType: TradeType) {
     const amounts: TokenAmount[] = new Array(route.path.length)
     const nextPairs: Pair[] = new Array(route.pairs.length)
     if (tradeType === TradeType.EXACT_INPUT) {
